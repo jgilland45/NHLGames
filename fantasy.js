@@ -25,6 +25,16 @@ class Team {
 	getName() {
 		return this.name;
 	}
+
+	getYear() {
+		return this.year;
+	}
+}
+
+class Game {
+	constructor() {
+		
+	}
 }
 
 class Player {
