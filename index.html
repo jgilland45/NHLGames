@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang='en'>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>NHL Stats</title>
+    <link href="style.css" rel="stylesheet" type="text/css">
+		<!-- Load an icon library to show a hamburger menu (bars) on small screens -->
+		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+		<link rel="shortcut icon" href="//www-league.nhlstatic.com/nhl.com/builds/site-core/b29c5604a47170b70efb4fecb5757f59632443d9_1612235767/images/favicon.ico">
+  </head>
+  <body>
+		<div id='header'><!--<img id='headerImg' src="https://upload.wikimedia.org/wikipedia/en/thumb/3/3a/05_NHL_Shield.svg/1200px-05_NHL_Shield.svg.png">--></div>
+		<!--Responsive nav bar from w3schools-->
+		<div class="topnav" id="myTopnav">
+  		<a href="index.html" class="active">Home</a>
+  		<a href="about.html">About</a>
+  		<a href="leaders.html">League Leaders</a>
+  		<a href="teams.html">Teams</a>
+  		<a href="playerSearch.html">Player Search</a>
+  		<a href="compare.html">Compare Player</a>
+  		<a href="funStats.html">Fun Stats</a>
+		<a href="fantasy.html">Fantasy</a>
+ 			<a href="javascript:void(0);" class="icon" onclick="myFunction()">
+  		  <i class="fa fa-bars"></i>
+  		</a>
+		</div>
+		<div id='content'>
+			<p>Welcome to the best NHL stats website on the World Wide Web! Here, you can find the league leaders in points, look at some in-depth team stats, search and compare players, and look at some fun (but still revealing) stats! Below is the NHL's official website! Go check it out!</p>
+			<iframe src="https://www.nhl.com/" title="NHL Website" id='nhlSite'></iframe>
+		</div>
+		<div id='footer'><p id='copy'>&copy; Jason Gillanders 2021, All Rights Reserved</p></div>
+		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  </body>
+</html>
