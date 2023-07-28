@@ -27,16 +27,17 @@
 		</div>
 		<div id='content'>
 			<div id="loading"></div>
-			<p>Welcome to the best NHL stats website on the World Wide Web! Here, you can find the league leaders in points, look at some in-depth team stats, search and compare players, and look at some fun (but still revealing) stats! Below is the NHL's official website! Go check it out!</p>
-			<p style="text-align: center;">Search for a player, and their stats will be shown!</p>
+			<button onclick="reloadGame()">Refresh page!</button>
+			<button onclick="printAllPlayers()">Print all players to console</button>
+			<button onclick="printAllGames()">Get all game data in console</button>
+			<p style="text-align: center;">Search for a teammate!</p>
+			<div id='showStartandEndPlayers'></div>
+			<div id='showPath'></div>
 			<div id='inputContainer'>
 				<input type="text" id="searchInput" onkeyup="hide()" placeholder="Search for names..">
 				<ul id="searchUl"></ul>
 			</div>
 			<div id='showStatsDiv'><p id="showPlayerSearchStats"></p></div>
-			<button onclick="runCode()">Load all player data!</button>
-			<button onclick="printAllPlayers()">Print all players to console</button>
-			<button onclick="printAllGames()">Get all game data in console</button>
 		</div>
 		<div id='footer'><p id='copy'>&copy; Jason Gillanders 2021, All Rights Reserved</p></div>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>

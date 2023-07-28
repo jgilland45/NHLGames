@@ -1,6 +1,7 @@
 var eachYearofGames = [];
 var bunchOfGames = [];
 var listOfPlayers = [];
+var loaded = false;
 
 
 function testFetch() {
@@ -34,7 +35,7 @@ function getSeason(seasonID) {
                 var gameString = response.data.dates[i].games[j].link;
                 // i cant just do this because it calls the API too many times too fast
                 // need to find a way to not overload the system
-                await sleep(50);
+                await sleep(0);
                 getGame(gameString, newYear);
             }
             //if (i>2) break;
@@ -46,8 +47,8 @@ function getSeason(seasonID) {
 function getGame(gameLink, gameYear) {
     axios.get("https://statsapi.web.nhl.com" + gameLink)
         .then((response) => {
-            // TODO: also get rid of all star game!!
-        if (response.data.gameData.game.type != "PR") {
+            // Only includes regular season and playoff games
+        if (response.data.gameData.game.type == "R" || response.data.gameData.game.type == "P") {
             gameYear.addGame(response.data);
             var newGame = new Game(response.data);
             bunchOfGames.push(newGame);
@@ -91,6 +92,18 @@ function getGame(gameLink, gameYear) {
                 listOfPlayers[getPlayerIndex(homeTeammates[i], listOfPlayers)].addTeamates(homeTeammates);
             }
         }
+		if (listOfPlayers.length == 1061 && loaded == false) {
+			console.log("RUNNING GOOD CODE");
+			var playerIndex = Math.floor(Math.random() * 1062);
+			var playerIndex2 = Math.floor(Math.random() * 1062);
+			while (playerIndex2 == playerIndex) {
+				playerIndex2 = Math.floor(Math.random() * 1062);
+			}
+			console.log("Starting player: " + listOfPlayers[playerIndex].name);
+			console.log("Ending player: " + listOfPlayers[playerIndex2].name);
+			choosePath(playerIndex, playerIndex2);
+			loaded = true;
+		}
     });
 }
 
@@ -324,11 +337,54 @@ function hideLoading() {
 		loader.style.display = 'none'
 }
 
-function runCode() {
+function runCode(playerIndex1, playerIndex2) {
 	//create the list of players
-	createLi();
+	createLi(playerIndex1, playerIndex2);
 	//hides the full list from the user
-	hide();
+	// hide();
+}
+
+function reloadGame() {
+	document.getElementById("showPath").replaceChildren();
+	document.getElementById('showPlayerSearchStats').innerHTML = "";
+	var playerIndex = Math.floor(Math.random() * 1062);
+	var playerIndex2 = Math.floor(Math.random() * 1062);
+	while (playerIndex2 == playerIndex) {
+		playerIndex2 = Math.floor(Math.random() * 1062);
+	}
+	console.log("Starting player: " + listOfPlayers[playerIndex].name);
+	console.log("Ending player: " + listOfPlayers[playerIndex2].name);
+	choosePath(playerIndex, playerIndex2);
+}
+
+function choosePath(startingPlayerIndex, endingPlayerIndex) {
+	var startEndDiv = document.getElementById("showStartandEndPlayers");
+	for (var i = 0; i < 2; i++) {
+		var playerStoreDiv = document.getElementById("showPath");
+		var newPlayerDiv = document.createElement("div");
+		newPlayerDiv.style.width = "200px";
+		newPlayerDiv.style.height = "100px";
+		newPlayerDiv.style.display = "inline-block";
+		newPlayerDiv.style.color = "white";
+		newPlayerDiv.style.padding = "10px";
+		playerStoreDiv.appendChild(newPlayerDiv);
+		var playerImg = document.createElement("IMG");
+		if (i==0) playerIndex = startingPlayerIndex;
+		else playerIndex = endingPlayerIndex;
+		playerImg.setAttribute("src","https://cms.nhl.bamgrid.com/images/headshots/current/168x168/" + listOfPlayers[playerIndex].id + ".jpg");
+		playerImg.setAttribute("width", "50px");
+		playerImg.setAttribute("height", "50px");
+		newPlayerDiv.appendChild(playerImg);
+		newPlayerDiv.innerHTML += listOfPlayers[playerIndex].name;
+		if (i==0) {
+			var arrowImg = document.createElement("IMG");
+			playerImg.setAttribute("src","https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Arrow_east.svg/1920px-Arrow_east.svg.png?20220723011022");
+			playerImg.setAttribute("width", "50px");
+			playerImg.setAttribute("height", "50px");
+			playerStoreDiv.appendChild(playerImg);
+		}
+	}
+	runCode(startingPlayerIndex, endingPlayerIndex);
 }
 
 //from w3schools
@@ -382,9 +438,10 @@ function hide() {
 }
 
 //creates the list of all NHL players' names
-function createLi() {
+function createLi(playerIndex1, playerIndex2) {
+	var currentPlayer = listOfPlayers[playerIndex1];
 	//for every player
-	for (var i in listOfPlayers)
+	for (var i in currentPlayer.teammates)
 	{
 		//a.innerHTML = allTeams();
 		//declare HTML elements
@@ -396,10 +453,10 @@ function createLi() {
 		li.appendChild(a);
 		//a.setAttribute("href","");
 		//if the name is not undefined (it sometimes did, so this gets rid of that problem)
-		if (listOfPlayers[i].name!=undefined)
+		if (currentPlayer.teammates[i].name!=undefined)
 		{
 			//show the player's name on the list
-			a.innerHTML = listOfPlayers[i].name;
+			a.innerHTML = currentPlayer.teammates[i].name;
 			//li.setAttribute("onclick","getSearchedStats(" + a.innerHTML + ")");
 		}
 		//add the list to the desired element
@@ -417,13 +474,13 @@ function createLi() {
 			aList[j].addEventListener("click",function() {
 				console.log("I HAVE BEEN CLICKED");
 				//show that player's stats!
-				whichPlayerWasInputted(this.innerHTML);
+				whichPlayerWasInputted(this.innerHTML, playerIndex2);
 			});
 		}
 	}
 }
 
-function whichPlayerWasInputted(playerInputName) {
+function whichPlayerWasInputted(playerInputName, playerIndex2) {
 	//declare HTML elements
 	var ul = document.getElementById("searchUl");
 	var li = ul.getElementsByTagName("li");
@@ -436,17 +493,39 @@ function whichPlayerWasInputted(playerInputName) {
 			li[i].style.display = 'none';
 		}
 		//get those stats!
-	displayPlayersTeammates(playerInputName);
+	displayPlayersTeammates(playerInputName, playerIndex2);
 }
 
-function displayPlayersTeammates(playerName) {
+function displayPlayersTeammates(playerName, playerIndex2) {
     var playerIndex = getPlayerByName(playerName, listOfPlayers);
-    console.log(listOfPlayers[playerIndex].teammates);
+    console.log("Player 1: " + listOfPlayers[playerIndex].name);
+    console.log("Player 2: " + listOfPlayers[playerIndex2].name);
+    console.log("Player 1 id: " + listOfPlayers[playerIndex].id);
+    console.log("Player 2 id: " + listOfPlayers[playerIndex2].id);
     document.getElementById('showPlayerSearchStats').innerHTML = "";
-    for (var i in listOfPlayers[playerIndex].teammates) {
-        console.log(listOfPlayers[playerIndex].teammates[i].name);
-	    document.getElementById('showPlayerSearchStats').innerHTML += listOfPlayers[playerIndex].teammates[i].name + "<br />";
-    }
+	var playerStoreDiv = document.getElementById("showPath");
+	var newPlayerDiv = document.createElement("div");
+	newPlayerDiv.style.width = "200px";
+	newPlayerDiv.style.height = "100px";
+	newPlayerDiv.style.display = "inline-block";
+	newPlayerDiv.style.color = "white";
+	newPlayerDiv.style.padding = "10px";
+	playerStoreDiv.appendChild(newPlayerDiv);
+	var playerImg = document.createElement("IMG");
+	playerImg.setAttribute("src","https://cms.nhl.bamgrid.com/images/headshots/current/168x168/" + listOfPlayers[playerIndex].id + ".jpg");
+	playerImg.setAttribute("width", "50px");
+	playerImg.setAttribute("height", "50px");
+	newPlayerDiv.appendChild(playerImg);
+	newPlayerDiv.innerHTML += listOfPlayers[playerIndex].name;
+
+	document.getElementById("searchUl").replaceChildren();
+	
+	if (listOfPlayers[playerIndex].id === listOfPlayers[playerIndex2].id) {
+		console.log("YOU WON PLEASE WIN DAMMIT");
+		document.getElementById('showPlayerSearchStats').innerHTML = "You won!";
+		return;
+	}
+	createLi(playerIndex, playerIndex2);
 }
 
 
