@@ -16,7 +16,8 @@ function testFetch() {
         }
         */
         getSeason('20222023');
-        hideLoading();
+        getSeason('20212022');
+        getSeason('20202021');
     });
 }
 
@@ -35,7 +36,7 @@ function getSeason(seasonID) {
                 var gameString = response.data.dates[i].games[j].link;
                 // i cant just do this because it calls the API too many times too fast
                 // need to find a way to not overload the system
-                await sleep(0);
+                await sleep(100);
                 getGame(gameString, newYear);
             }
             //if (i>2) break;
@@ -92,7 +93,7 @@ function getGame(gameLink, gameYear) {
                 listOfPlayers[getPlayerIndex(homeTeammates[i], listOfPlayers)].addTeamates(homeTeammates);
             }
         }
-		if (listOfPlayers.length == 1061 && loaded == false) {
+		if (listOfPlayers.length == 1388 && loaded == false) {
 			console.log("RUNNING GOOD CODE");
 			var playerIndex = Math.floor(Math.random() * 1062);
 			var playerIndex2 = Math.floor(Math.random() * 1062);
@@ -103,6 +104,7 @@ function getGame(gameLink, gameYear) {
 			console.log("Ending player: " + listOfPlayers[playerIndex2].name);
 			choosePath(playerIndex, playerIndex2);
 			loaded = true;
+			hideLoading();
 		}
     });
 }
@@ -112,10 +114,10 @@ function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function getPlayerByName(obj, list) {
+function getPlayerByID(obj, list) {
     var i;
     for (i = 0; i < list.length; i++) {
-        if (list[i].name === obj) {
+        if (list[i].id === obj) {
             return i;
         }
     }
@@ -126,7 +128,7 @@ function getPlayerByName(obj, list) {
 function containsPlayer(obj, list) {
     var i;
     for (i = 0; i < list.length; i++) {
-        if (list[i].name === obj.name) {
+        if (list[i].id === obj.id) {
             return true;
         }
     }
@@ -137,7 +139,7 @@ function containsPlayer(obj, list) {
 function getPlayerIndex(obj, list) {
     var i;
     for (i = 0; i < list.length; i++) {
-        if (list[i].name === obj.name) {
+        if (list[i].id === obj.id) {
             return i;
         }
     }
@@ -325,10 +327,10 @@ var loader = document.getElementById("loading");
 // showing loading
 function displayLoading() {
     loader.classList.add("display");
-    // to stop loading after some time (100 seconds)
+    // to stop loading after some time (10000 seconds)
     setTimeout(() => {
         loader.classList.remove("display");
-    }, 100000);
+    }, 10000000);
 }
 
 // hiding loading 
@@ -457,6 +459,7 @@ function createLi(playerIndex1, playerIndex2) {
 		{
 			//show the player's name on the list
 			a.innerHTML = currentPlayer.teammates[i].name;
+			a.id = currentPlayer.teammates[i].id;
 			//li.setAttribute("onclick","getSearchedStats(" + a.innerHTML + ")");
 		}
 		//add the list to the desired element
@@ -474,13 +477,13 @@ function createLi(playerIndex1, playerIndex2) {
 			aList[j].addEventListener("click",function() {
 				console.log("I HAVE BEEN CLICKED");
 				//show that player's stats!
-				whichPlayerWasInputted(this.innerHTML, playerIndex2);
+				whichPlayerWasInputted(this.id, playerIndex2);
 			});
 		}
 	}
 }
 
-function whichPlayerWasInputted(playerInputName, playerIndex2) {
+function whichPlayerWasInputted(playerClickedID, playerIndex2) {
 	//declare HTML elements
 	var ul = document.getElementById("searchUl");
 	var li = ul.getElementsByTagName("li");
@@ -493,11 +496,11 @@ function whichPlayerWasInputted(playerInputName, playerIndex2) {
 			li[i].style.display = 'none';
 		}
 		//get those stats!
-	displayPlayersTeammates(playerInputName, playerIndex2);
+	displayPlayersTeammates(playerClickedID, playerIndex2);
 }
 
-function displayPlayersTeammates(playerName, playerIndex2) {
-    var playerIndex = getPlayerByName(playerName, listOfPlayers);
+function displayPlayersTeammates(playerClickedID, playerIndex2) {
+    var playerIndex = getPlayerByID(Number(playerClickedID), listOfPlayers);
     console.log("Player 1: " + listOfPlayers[playerIndex].name);
     console.log("Player 2: " + listOfPlayers[playerIndex2].name);
     console.log("Player 1 id: " + listOfPlayers[playerIndex].id);
